@@ -12,8 +12,10 @@ class LoginPage:
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input[name='password']")
     YALLA_BTN = (By.XPATH, "//button[text()='Y’alla!']")
     CONFIRMATION_TEXT = (By.CSS_SELECTOR, "h3")
+    CONFIRMATION_TEXT_1 = (By.CSS_SELECTOR, "p")
     OK_BTN = (By.XPATH, "//*[text()='OK']")
-    LOG_OUT_BTN = (By.XPATH,"//*[text()='Log out']")
+    LOG_OUT_BTN = (By.XPATH, "//*[text()='Log out']")
+    ERROR_MESSAGE = (By.CLASS_NAME, "error")
 
     def __init__(self, driver):
         self.driver = driver
@@ -38,10 +40,16 @@ class LoginPage:
         self.fill_password(password)
         self.submit_login()
 
-    def login_success_text(self):
+    def confirmation_text(self):
         # return self.driver.find_element(*self.CONFIRMATION_TEXT).text
         element = WebDriverWait(self.driver, timeout=5).until(
             EC.visibility_of_element_located(self.CONFIRMATION_TEXT))
+        return element.text
+
+    def confirmation_text_1(self):
+        # return self.driver.find_element(*self.CONFIRMATION_TEXT).text
+        element = WebDriverWait(self.driver, timeout=5).until(
+            EC.visibility_of_element_located(self.CONFIRMATION_TEXT_1))
         return element.text
 
     def close_window(self):
@@ -49,9 +57,20 @@ class LoginPage:
 
     def is_logged(self):
         try:
-            WebDriverWait(self.driver,timeout=5).until(
+            WebDriverWait(self.driver, timeout=5).until(
                 EC.visibility_of_element_located(self.LOG_OUT_BTN)
             )
             return True
         except TimeoutException:
             return False
+
+    def error_message_text(self):
+        element = WebDriverWait(self.driver, 5).until(
+            EC.visibility_of_element_located(self.ERROR_MESSAGE))
+        return element.text
+
+    def submit_button_disabled(self):
+        element = WebDriverWait(self.driver, 5).until(
+            EC.presence_of_element_located(self.YALLA_BTN)
+        )
+        return element.get_attribute("disabled") is not None
